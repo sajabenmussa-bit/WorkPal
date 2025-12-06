@@ -16,12 +16,12 @@ public class RegisterForm extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Panel رئيسي
+        // Panel 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // عناصر الإدخال
+        // input objects
         JLabel lblUsername = new JLabel("Username:");
         txtUsername = new JTextField();
 
@@ -33,19 +33,19 @@ public class RegisterForm extends JFrame {
 
         btnRegister = new JButton("Register");
 
-        // إضافة العناصر للـ Panel
+        // add elements
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(lblPassword);
         panel.add(txtPassword);
         panel.add(lblEmail);
         panel.add(txtEmail);
-        panel.add(new JLabel()); // فراغ
+        panel.add(new JLabel()); 
         panel.add(btnRegister);
 
         add(panel);
 
-        // حدث الضغط على زر التسجيل
+    
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,7 +60,7 @@ public class RegisterForm extends JFrame {
         String email = txtEmail.getText();
 
         if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please fill all fields ", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -73,17 +73,14 @@ public class RegisterForm extends JFrame {
 
             int rows = stmt.executeUpdate();
             if (rows > 0) {
-                JOptionPane.showMessageDialog(this, "User registered successfully!");
+                JOptionPane.showMessageDialog(this, "registered successfully");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving user!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error saving user", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new RegisterForm().setVisible(true);
-        });
-    }
+   
 }
+
