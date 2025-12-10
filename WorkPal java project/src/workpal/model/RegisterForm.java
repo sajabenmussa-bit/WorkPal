@@ -3,8 +3,7 @@ package workpal.model;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 public class RegisterForm extends JFrame {
     private JTextField txtUsername, txtEmail;
@@ -17,12 +16,12 @@ public class RegisterForm extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Panel ?????
+       
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // ????? ???????
+        
         JLabel lblUsername = new JLabel("Username:");
         txtUsername = new JTextField();
 
@@ -34,19 +33,19 @@ public class RegisterForm extends JFrame {
 
         btnRegister = new JButton("Register");
 
-        // ????? ??????? ??? Panel
+        
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(lblPassword);
         panel.add(txtPassword);
         panel.add(lblEmail);
         panel.add(txtEmail);
-        panel.add(new JLabel()); // ????
+        panel.add(new JLabel()); 
         panel.add(btnRegister);
 
         add(panel);
 
-        // ??? ????? ??? ?? ???????
+        
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
