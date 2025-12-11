@@ -94,13 +94,7 @@ public void setTasks(List<Task> tasks) {
        tasks.remove(t);
    } 
 
-    public String getTitle() {
-        return title;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
+    
 
     
    

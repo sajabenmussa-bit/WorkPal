@@ -9,13 +9,14 @@ public class WorkPal {
      javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // إنشاء نموذج تسجيل المستخدم
+                // add user
                 RegisterForm registerForm = new RegisterForm();
                 registerForm.setVisible(true);
             }
         });
-      javax.swing.SwingUtilities.invokeLater(() -> {
-            new RegisterForm().setVisible(true);
+               // add project
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                new RegisterForm().setVisible(true);
         });
      
     
