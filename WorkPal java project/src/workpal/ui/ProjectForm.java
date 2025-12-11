@@ -41,12 +41,12 @@ public class ProjectForm extends JFrame {
 
         JLabel lblStartDate = new JLabel("Start date:");
         lblStartDate.setBounds(40, 140, 100, 30);
-        txtStartDate = new JTextField("yyyy-MM-dd");
+        txtStartDate = new JTextField("");
         txtStartDate.setBounds(150, 140, 200, 30);
 
         JLabel lblEndDate = new JLabel("End date:");
         lblEndDate.setBounds(40, 180, 100, 30);
-        txtEndDate = new JTextField("yyyy-MM-dd");
+        txtEndDate = new JTextField("");
         txtEndDate.setBounds(150, 180, 200, 30);
 
         btnContinue = new JButton("continue");
@@ -83,7 +83,7 @@ public class ProjectForm extends JFrame {
         }
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("");
             Date startDate = sdf.parse(startDateStr);
             Date endDate = sdf.parse(endDateStr);
 
@@ -95,8 +95,8 @@ public class ProjectForm extends JFrame {
                 JOptionPane.showMessageDialog(this, "Project saved successfully!");
                 txtTitle.setText("");
                 txtDescription.setText("");
-                txtStartDate.setText("yyyy-MM-dd");
-                txtEndDate.setText("yyyy-MM-dd");
+                txtStartDate.setText("");
+                txtEndDate.setText("");
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to save project.", "Error", JOptionPane.ERROR_MESSAGE);
             }

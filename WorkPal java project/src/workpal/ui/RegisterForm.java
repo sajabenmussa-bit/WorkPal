@@ -62,7 +62,7 @@ public class RegisterForm extends JFrame {
         btnConfirm.setBackground(new Color(0, 51, 102));
         btnConfirm.setForeground(Color.WHITE);
         btnConfirm.setFont(new Font("Arial", Font.BOLD, 16));
-        btnConfirm.setFocusPainted(false);
+
         btnConfirm.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1, true));
 
         // Add components
