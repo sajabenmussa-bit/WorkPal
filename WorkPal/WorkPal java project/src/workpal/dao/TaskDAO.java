@@ -93,5 +93,32 @@ public class TaskDAO {
             return false;
         }
     }
+    public List<Task> getTasksByProject(int projectId) {
+    List<Task> tasks = new ArrayList<>();
+    String sql = "SELECT * FROM tasks WHERE projectId = ?";
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, projectId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Task t = new Task(
+                rs.getInt("taskId"),
+                rs.getInt("projectId"),
+                rs.getString("title"),
+                rs.getString("description"),
+                rs.getDate("dueDate")
+            );
+            tasks.add(t);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return tasks;
+}
 }
 

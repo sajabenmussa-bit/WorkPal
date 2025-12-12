@@ -94,6 +94,34 @@ public class ProjectDAO {
             return false;
         }
     }
+    //All projects
+    // داخل ProjectDAO
+    public List<Project> getAllProjects() {
+     List<Project> projects = new ArrayList<>();
+     String sql = "SELECT * FROM project";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+             Project project = new Project(
+                rs.getInt("project_id"),
+                rs.getInt("user_id"),
+                rs.getString("title"),
+                rs.getString("description"),
+                rs.getDate("start_date"),
+                rs.getDate("end_date")
+            );
+            projects.add(project);
+        }
+
+     } catch (SQLException e) {
+        e.printStackTrace();
+        }
+
+     return projects;
+}
 }
 
 

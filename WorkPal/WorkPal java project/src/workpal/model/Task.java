@@ -26,6 +26,10 @@ public class Task {
     public Task(int aInt, String string, String string0, int aInt0) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+    public Task(int i, String title, String description) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     //Methods
     public void markComplete(){
         this.status="Completed";

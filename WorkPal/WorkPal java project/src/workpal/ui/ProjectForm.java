@@ -13,8 +13,10 @@ import workpal.dao.ProjectDAO;
 
 public class ProjectForm extends JFrame {
     private JTextField txtTitle, txtDescription, txtStartDate, txtEndDate;
-    private JButton btnContinue;
-
+    private JButton btnContinue, btnManageTasks;
+    private JTable tableProjects;
+    private ProjectDAO projectDAO = new ProjectDAO();
+    
     public ProjectForm() {
         setTitle("Project Form");
         setSize(400, 400);
@@ -48,7 +50,13 @@ public class ProjectForm extends JFrame {
         lblEndDate.setBounds(40, 180, 100, 30);
         txtEndDate = new JTextField("");
         txtEndDate.setBounds(150, 180, 200, 30);
-
+        btnContinue =new JButton("Manage Tasks");
+        btnContinue.setBounds(50, 200, 140, 30);
+        //Project Table
+        tableProjects=new JTable();
+        JScrollPane scrollPane =new JScrollPane(tableProjects);
+        scrollPane.setBounds(40, 250, 400, 180);
+        
         btnContinue = new JButton("continue");
         btnContinue.setBounds(130, 250, 140, 40);
         btnContinue.setBackground(new Color(0, 51, 102));
@@ -60,8 +68,9 @@ public class ProjectForm extends JFrame {
         add(lblDescription); add(txtDescription);
         add(lblStartDate); add(txtStartDate);
         add(lblEndDate); add(txtEndDate);
-        add(btnContinue);
-
+        add(btnContinue);add(btnManageTasks);
+        add(scrollPane);
+        loadProjectsToTable();
         // Action Listener
         btnContinue.addActionListener(new ActionListener() {
             @Override
@@ -69,6 +78,9 @@ public class ProjectForm extends JFrame {
                 saveProject();
             }
         });
+       btnContinue.addActionListener(e -> saveProject());
+        btnManageTasks.addActionListener(e -> openTaskForm());
+        
     }
 
     private void saveProject() {
@@ -106,4 +118,38 @@ public class ProjectForm extends JFrame {
             JOptionPane.showMessageDialog(this, "Invalid date format. Use yyyy-MM-dd", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private void loadProjectsToTable() {
+        var projects = projectDAO.getAllProjects();
+        String[] columns = {"Project ID", "Title", "Description"};
+        Object[][] data = new Object[projects.size()][3];
+
+        for (int i = 0; i < projects.size(); i++) {
+            Project p = projects.get(i);
+            data[i][0] = p.getProjectId();
+            data[i][1] = p.getTitle();
+            data[i][2] = p.getDescription();
+        }
+
+        tableProjects.setModel(new javax.swing.table.DefaultTableModel(data, columns));
+    }
+
+    private void openTaskForm() {
+        int selectedRow = tableProjects.getSelectedRow();
+        if (selectedRow >= 0) {
+            int projectId = (int) tableProjects.getValueAt(selectedRow, 0);
+            String title = (String) tableProjects.getValueAt(selectedRow, 1);
+            String description = (String) tableProjects.getValueAt(selectedRow, 2);
+
+            Project selectedProject = new Project(projectId, 1, title, description, null, null);
+            TaskForm taskForm = new TaskForm(selectedProject);
+            taskForm.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a project first!");
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new ProjectForm().setVisible(true));
+    }
 }
+
