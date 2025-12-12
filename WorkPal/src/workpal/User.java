@@ -1,46 +1,41 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package workpal;
 
-import java.io.*;
-import java.util.*;
 
-
-public class User implements Serializable {
-    private int userId;
-    private String username;
-    private String passwordHash; 
-    private String email;
-    
-    public User(int userId, String username, String passwordHash, String email) {
-        this.userId = userId;
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.email = email; 
-    }
-    
-   public String getUsername() {
-        return username;
-    }
+public class user {
    
-   public String getEmail() {
-        return email;
-    }
-  public void setUsername(String username) {
+    private int id;
+    private String username;
+    private String password;
+    private String email;
+
+    public user(String username, String password, String email) {
         this.username = username;
-  }
-  //this is a email setter
-  public void setEmail(String email) {
+        this.password = password;
         this.email = email;
     }
 
-    User(int i, String saja_freelancer, String hash_value, String sajaworkcom, String saja_J, String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // Getters & Setters
+    public String getUsername() { 
+        return username; 
     }
-    
-    
-    
+    public void setUsername(String username) { 
+        this.username = username;
+    }
+
+    public String getPassword() { 
+        return password; 
+    }
+    public void setPassword(String password) {
+        this.password = password; 
+    }
+
+    public String getEmail() { 
+        return email; 
+    }
+    public void setEmail(String email) {
+        this.email = email; 
+    }
 }
+
+
