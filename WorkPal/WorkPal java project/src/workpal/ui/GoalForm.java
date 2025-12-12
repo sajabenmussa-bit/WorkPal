@@ -1,0 +1,186 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package workpal.ui;
+
+import workpal.dao.GoalDAO;
+import workpal.model.Goal;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.*;
+import java.util.List;
+
+/**
+ *
+ * @author Bashaer
+ */
+public class GoalForm extends JFrame{
+    private JTable tableGoals;
+    private JTextField txtTitle, txtDescription, txtUserId;
+    private JButton btnAdd , btnUpdate, btnDelete;
+    private GoalDAO goalDAO = new GoalDAO();
+    public GoalForm (){
+        setTitle("GOal Manager");
+        setSize(600,400);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(null);
+        //Inout Fields
+        JLabel lblTitle = new JLabel("Goal Title");
+        lblTitle.setBounds(20, 20, 100, 25);
+        
+        txtTitle=new JTextField();
+        txtTitle.setBounds(130, 20, 150, 25);
+        
+        JLabel lblDescription =new JLabel("Description");
+        lblDescription.setBounds(20, 60, 100, 25);
+        
+        txtDescription =new JTextField();
+        txtDescription.setBounds(130, 60, 150, 25);
+        
+        JLabel lblUserId =new JLabel("User Id");
+        lblUserId.setBounds(20, 100, 150, 25);
+        
+        txtUserId =new JTextField();
+        txtUserId.setBounds(130, 100, 150, 25);
+        
+        add(lblTitle); add(txtTitle);
+        add(lblDescription); add(txtDescription);
+        add(lblUserId); add(txtUserId);
+        //Buttons
+        btnAdd=new JButton("Add");
+        btnAdd.setBounds(320, 20, 120, 30);
+        
+        btnUpdate= new JButton("Update");
+        btnUpdate.setBounds(320, 60, 120, 30);
+        
+        btnDelete =new JButton ("Delete");
+        btnDelete.setBounds(320, 100, 120, 30);
+        
+        add(btnAdd); add(btnUpdate); add(btnDelete);
+        //Table
+        tableGoals = new JTable(new DefaultTableModel(new Object[]{"Goal ID", "Title", "Description", "User ID"}, 0));
+        JScrollPane scrollPane = new JScrollPane(tableGoals);
+        scrollPane.setBounds(20, 150, 550, 200);
+        add(scrollPane);
+
+        loadGoalsToTable();
+        //Button Action
+        btnAdd.addActionListener(e -> addGoal());
+        btnUpdate.addActionListener(e -> updateGoal());
+        btnDelete.addActionListener(e -> deleteGoal());
+
+        tableGoals.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int row = tableGoals.getSelectedRow();
+                if (row >= 0) {
+                    txtTitle.setText(tableGoals.getValueAt(row, 1).toString());
+                    txtDescription.setText(tableGoals.getValueAt(row, 2).toString());
+                    txtUserId.setText(tableGoals.getValueAt(row, 3).toString());
+                }
+            }
+        });
+    }
+    //Load Data
+    private void loadGoalsToTable() {
+        List<Goal> goals = goalDAO.getAllGoals();
+        DefaultTableModel model = (DefaultTableModel) tableGoals.getModel();
+        model.setRowCount(0);
+
+        for (Goal g : goals) {
+            model.addRow(new Object[]{
+                    g.getGoalId(),
+                    g.getTitle(),
+                    g.getDescription(),
+                    g.getUserId()
+            });
+        }
+    }
+        //Add Goal
+        
+     private void addGoal() {
+        try {
+            String title = txtTitle.getText();
+            String description = txtDescription.getText();
+            int userId = Integer.parseInt(txtUserId.getText());
+
+            Goal goal = new Goal(0, userId, title, description);
+            boolean success = goalDAO.addGoal(goal);
+
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Goal added successfully!");
+                loadGoalsToTable();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to add goal.");
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "User ID must be a number!");
+        }
+    }
+     //Update Goal
+     private void updateGoal() {
+        int row = tableGoals.getSelectedRow();
+
+        if (row >= 0) {
+            try {
+                int goalId = (int) tableGoals.getValueAt(row, 0);
+                String title = txtTitle.getText();
+                String description = txtDescription.getText();
+                int userId = Integer.parseInt(txtUserId.getText());
+
+                Goal goal = new Goal(goalId, userId, title, description);
+                boolean success = goalDAO.updateGoal(goal);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Goal updated successfully!");
+                    loadGoalsToTable();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update goal.");
+                }
+
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "User ID must be a number!");
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a goal to update.");
+        }
+    }
+     //Delete Goal
+     private void deleteGoal() {
+        int row = tableGoals.getSelectedRow();
+
+        if (row >= 0) {
+            int goalId = (int) tableGoals.getValueAt(row, 0);
+
+            boolean success = goalDAO.removeGoal(goalId);
+
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Goal deleted successfully!");
+                loadGoalsToTable();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete goal.");
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a goal to delete.");
+        }
+    }
+     //Main
+     public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GoalForm().setVisible(true));
+    }
+     
+    }  
+     
+        
+    
+    
+    
+    
+    
+    
+    
+

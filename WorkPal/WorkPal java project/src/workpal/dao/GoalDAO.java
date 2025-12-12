@@ -18,7 +18,6 @@ public class GoalDAO {
             stmt.setInt(1, goal.getUserId());
             stmt.setString(2, goal.getTitle());
             stmt.setString(3, goal.getDescription());
-            stmt.setString(4, goal.getTargetDate());
 
             int rows = stmt.executeUpdate();
             return rows > 0;
@@ -45,8 +44,7 @@ public class GoalDAO {
                         rs.getInt("goal_id"),
                         rs.getInt("user_id"),
                         rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getString("target_date")
+                        rs.getString("description")
                 );
                 goals.add(goal);
             }
@@ -65,7 +63,6 @@ public class GoalDAO {
 
             stmt.setString(1, goal.getTitle());
             stmt.setString(2, goal.getDescription());
-            stmt.setString(3, goal.getTargetDate());
             stmt.setInt(4, goal.getGoalId());
 
             int rows = stmt.executeUpdate();
@@ -92,6 +89,32 @@ public class GoalDAO {
             return false;
         }
     }
+    //Get all Goals Method
+    public List<Goal> getAllGoals() {
+    List<Goal> goals = new ArrayList<>();
+
+    String sql = "SELECT * FROM goals";
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+                Goal goal = new Goal(
+                        rs.getInt("goal_id"),
+                        rs.getInt("user_id"),
+                        rs.getString("title"),
+                        rs.getString("description")
+                );
+                goals.add(goal);
+            }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return goals;
+}
 }
 
 
