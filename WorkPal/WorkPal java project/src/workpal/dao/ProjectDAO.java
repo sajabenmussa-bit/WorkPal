@@ -122,6 +122,30 @@ public class ProjectDAO {
 
      return projects;
 }
+    public Project getProjectById(int projectId) {
+    String sql = "SELECT * FROM projects WHERE projectId = ?";
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setInt(1, projectId);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return new Project(
+                rs.getInt("projectId"),
+                rs.getInt("userId"),
+                rs.getString("title"),
+                rs.getString("description"),
+                rs.getDate("startDate"),
+                rs.getDate("endDate")
+            );
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null; 
+}
 }
 
 

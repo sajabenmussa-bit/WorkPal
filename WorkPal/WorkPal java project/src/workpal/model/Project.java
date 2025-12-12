@@ -93,6 +93,11 @@ public void setTasks(List<Task> tasks) {
        tasks.remove(t);
    } 
 
+    @Override
+    public String toString() {
+        return title;
+    }
+
     
 
     

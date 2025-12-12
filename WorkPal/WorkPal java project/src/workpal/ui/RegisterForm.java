@@ -1,5 +1,6 @@
 
 package workpal.ui;
+import Session.SessionManager;
 import workpal.ui.ProjectForm;
 
 
@@ -104,6 +105,8 @@ public class RegisterForm extends JFrame {
 
             int rows = stmt.executeUpdate();
             if (rows > 0) {
+                SessionManager.saveLogin(username);
+                new MainForm().setVisible(true);
                 JOptionPane.showMessageDialog(this, "User registered successfully!");
                 new ProjectForm().setVisible(true); 
                 this.dispose();

@@ -14,17 +14,20 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import workpal.dao.ProjectDAO;
 import workpal.model.Project;
 /**
  *
  * @author Bashaer
  */
 public class TaskForm extends JFrame{
+    private JComboBox<Project> projectComboBox;
     private Project project;
     private JTable tableTasks;
     private JTextField txtTitle, txtDescription, txtProjectId ;
     private JButton btnAdd, btnUpdate , btnDelete;
     private TaskDAO taskDAO = new TaskDAO (); 
+    ProjectDAO projectDAO = new ProjectDAO();
     public TaskForm(Project project){
         this.project=project;   //project passed from projectForm
         loadTasksToTable();
@@ -66,83 +69,107 @@ public class TaskForm extends JFrame{
         // Table click
         tableTasks.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                int selectedRow = tableTasks.getSelectedRow();
-                if(selectedRow >= 0){
-                    txtTitle.setText(tableTasks.getValueAt(selectedRow,1).toString());
-                    txtDescription.setText(tableTasks.getValueAt(selectedRow,2).toString());
+                int row = tableTasks.getSelectedRow();
+                if(row >= 0){
+                    txtTitle.setText(tableTasks.getValueAt(row,1).toString());
+                    txtDescription.setText(tableTasks.getValueAt(row,2).toString());
+                    
+                }
+                int projectId=(int) tableTasks.getValueAt(row, 3);
+                for(int i=0;i<projectComboBox.getItemCount();i++){
+                    if(projectComboBox.getItemAt(i).getProjectId()==projectId){
+                        projectComboBox.setSelectedIndex(i);
+                        break;
+                    }
                 }
             }
         });
     }
-    
-    private void loadTasksToTable() {
-        List<Task> tasks = taskDAO.getTasksByProject(project.getProjectId()); 
-        DefaultTableModel model = new DefaultTableModel(new Object[]{"Task ID","Title","Description"},0);
-        
-        for(Task t : tasks){
-            model.addRow(new Object[]{t.getTaskId(), t.getTitle(), t.getDescription()});
-        }
-        tableTasks.setModel(model);
+
+    TaskForm() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    private void loadProjectsToComboBox() {
+    projectComboBox.removeAllItems();
+    List<Project> projects = projectDAO.getAllProjects();
+    for(Project p : projects){
+        projectComboBox.addItem(p);
+    }
+}
+   private void loadTasksToTable() {
+    DefaultTableModel model = (DefaultTableModel) tableTasks.getModel();
+    model.setRowCount(0);
+
+    List<Task> tasks = taskDAO.getAllTasks(); // أو getTasksByProject(selectedProjectId)
+    for(Task t : tasks){
+        Project p = projectDAO.getProjectById(t.getProjectId()); // جلب المشروع
+        model.addRow(new Object[]{
+            t.getTaskId(),
+            t.getTitle(),
+            t.getDescription(),
+            p // تخزين الكائن Project مباشرة
+        });
+    }
+}
     private void addTask() {
-        try {
-            String title = txtTitle.getText();
-            String description = txtDescription.getText();
-            if(title.isEmpty()|| description.isEmpty()){
-                JOptionPane.showMessageDialog(this, "Fill all Fields!");
-                return;
-            } 
-            Task task = new Task(0, title, description,project.getProjectId());
-            boolean success=taskDAO.addTask(task);
-            if(success){
-                 JOptionPane.showMessageDialog(this, "Task added successfully!");
-                 txtTitle.setText("");
-                 txtDescription.setText("");
-                 loadTasksToTable();
-            }else{
-                JOptionPane.showMessageDialog(this, "Failed to add Task !");
-            }
-        } catch(NumberFormatException ex){
-            JOptionPane.showMessageDialog(this, "Project ID must be a number!");
-        }
+    Project selectedProject = (Project) projectComboBox.getSelectedItem();
+    if(selectedProject == null){
+        JOptionPane.showMessageDialog(this, "Please select a project!");
+        return;
     }
+
+    String title = txtTitle.getText();
+    String description = txtDescription.getText();
+
+    Task task = new Task(0, title, description, selectedProject.getProjectId());
+    boolean success = taskDAO.addTask(task);
+
+    if(success){
+        JOptionPane.showMessageDialog(this, "Task added successfully!");
+        txtTitle.setText("");
+        txtDescription.setText("");
+        loadTasksToTable();
+    } else {
+        JOptionPane.showMessageDialog(this, "Failed to add Task!");
+    }
+ }
     
     private void updateTask() {
-        int selectedRow = tableTasks.getSelectedRow();
-        if(selectedRow >= 0){
-            
-                int taskId = (int) tableTasks.getValueAt(selectedRow,0);
-                String title = txtTitle.getText();
-                String description = txtDescription.getText();
+    int selectedRow = tableTasks.getSelectedRow();
+    if(selectedRow >= 0){
+        int taskId = (int) tableTasks.getValueAt(selectedRow, 0);
+        String title = txtTitle.getText();
+        String description = txtDescription.getText();
+        Project selectedProject = (Project) projectComboBox.getSelectedItem();
 
-                Task task = new Task(taskId, title, description);
-                boolean success = taskDAO.updateTask(task);
-                if(success){
-                    JOptionPane.showMessageDialog(this, "Task updated successfully!");
-                    loadTasksToTable();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to update task.");
-                }
-            
+        Task task = new Task(taskId, title, description, selectedProject.getProjectId());
+        boolean success = taskDAO.updateTask(task);
+        if(success){
+            JOptionPane.showMessageDialog(this, "Task updated successfully!");
+            loadTasksToTable();
         } else {
-            JOptionPane.showMessageDialog(this, "Please select a task to update.");
+            JOptionPane.showMessageDialog(this, "Failed to update task.");
         }
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a task to update.");
     }
+}
 
     private void deleteTask() {
-        int selectedRow = tableTasks.getSelectedRow();
-        if(selectedRow >= 0){
-            int taskId = (int) tableTasks.getValueAt(selectedRow,0);
-            boolean success = taskDAO.removeTask(taskId);
-            if(success){
-                JOptionPane.showMessageDialog(this, "Task deleted successfully!");
-                loadTasksToTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete task.");
-            }
+    int selectedRow = tableTasks.getSelectedRow();
+    if(selectedRow >= 0){
+        int taskId = (int) tableTasks.getValueAt(selectedRow, 0);
+        boolean success = taskDAO.removeTask(taskId);
+        if(success){
+            JOptionPane.showMessageDialog(this, "Task deleted successfully!");
+            loadTasksToTable();
         } else {
-            JOptionPane.showMessageDialog(this, "Please select a task to delete.");
+            JOptionPane.showMessageDialog(this, "Failed to delete task.");
         }
-    } 
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a task to delete.");
+    }
+}
+    
 }
 
