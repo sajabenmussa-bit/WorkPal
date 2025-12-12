@@ -97,19 +97,33 @@ public class TaskForm extends JFrame{
     }
 }
    private void loadTasksToTable() {
-    DefaultTableModel model = (DefaultTableModel) tableTasks.getModel();
-    model.setRowCount(0);
+    SwingWorker<Void, Task> worker = new SwingWorker<>() {
+        @Override
+        protected Void doInBackground() throws Exception {
+            List<Task> tasks = taskDAO.getAllTasks(); // أو getTasksByProject(selectedProjectId)
+            for (Task t : tasks) {
+                publish(t); // ترسل كل مهمة لواجهة المستخدم
+            }
+            return null;
+        }
 
-    List<Task> tasks = taskDAO.getAllTasks(); // أو getTasksByProject(selectedProjectId)
-    for(Task t : tasks){
-        Project p = projectDAO.getProjectById(t.getProjectId()); // جلب المشروع
-        model.addRow(new Object[]{
-            t.getTaskId(),
-            t.getTitle(),
-            t.getDescription(),
-            p // تخزين الكائن Project مباشرة
-        });
-    }
+        @Override
+        protected void process(List<Task> chunks) {
+            DefaultTableModel model = (DefaultTableModel) tableTasks.getModel();
+            model.setRowCount(0); // تنظيف الجدول
+            for (Task t : chunks) {
+                Project p = projectDAO.getProjectById(t.getProjectId());
+                model.addRow(new Object[]{
+                    t.getTaskId(),
+                    t.getTitle(),
+                    t.getDescription(),
+                    p // تخزين الكائن Project مباشرة
+                });
+            }
+        }
+    };
+
+    worker.execute(); // يبدأ التنفيذ بالخلفية
 }
     private void addTask() {
     Project selectedProject = (Project) projectComboBox.getSelectedItem();
