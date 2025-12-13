@@ -168,10 +168,7 @@ public class GoalForm extends JFrame{
             JOptionPane.showMessageDialog(this, "Please select a goal to delete.");
         }
     }
-     //Main
-     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new GoalForm().setVisible(true));
-    }
+  
      
     }  
      
