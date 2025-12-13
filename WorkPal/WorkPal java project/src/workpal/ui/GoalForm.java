@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class GoalForm extends JFrame{
     private JTable tableGoals;
-    private JTextField txtTitle, txtDescription, txtUserId;
+    private JTextField txtTitle, txtDescription;
     private JButton btnAdd , btnUpdate, btnDelete;
     private GoalDAO goalDAO = new GoalDAO();
     public GoalForm (){
@@ -42,12 +42,10 @@ public class GoalForm extends JFrame{
         JLabel lblUserId =new JLabel("User Id");
         lblUserId.setBounds(20, 100, 150, 25);
         
-        txtUserId =new JTextField();
-        txtUserId.setBounds(130, 100, 150, 25);
         
         add(lblTitle); add(txtTitle);
         add(lblDescription); add(txtDescription);
-        add(lblUserId); add(txtUserId);
+        add(lblUserId);
         //Buttons
         btnAdd=new JButton("Add");
         btnAdd.setBounds(320, 20, 120, 30);
@@ -77,7 +75,6 @@ public class GoalForm extends JFrame{
                 if (row >= 0) {
                     txtTitle.setText(tableGoals.getValueAt(row, 1).toString());
                     txtDescription.setText(tableGoals.getValueAt(row, 2).toString());
-                    txtUserId.setText(tableGoals.getValueAt(row, 3).toString());
                 }
             }
         });
@@ -103,9 +100,9 @@ public class GoalForm extends JFrame{
         try {
             String title = txtTitle.getText();
             String description = txtDescription.getText();
-            int userId = Integer.parseInt(txtUserId.getText());
+           
 
-            Goal goal = new Goal(0, userId, title, description);
+            Goal goal = new Goal(0, title, description);
             boolean success = goalDAO.addGoal(goal);
 
             if (success) {
@@ -128,9 +125,9 @@ public class GoalForm extends JFrame{
                 int goalId = (int) tableGoals.getValueAt(row, 0);
                 String title = txtTitle.getText();
                 String description = txtDescription.getText();
-                int userId = Integer.parseInt(txtUserId.getText());
+                
 
-                Goal goal = new Goal(goalId, userId, title, description);
+                Goal goal = new Goal(goalId, title, description);
                 boolean success = goalDAO.updateGoal(goal);
 
                 if (success) {
