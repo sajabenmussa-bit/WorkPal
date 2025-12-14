@@ -1,33 +1,34 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package workpal.ui;
 
-import Session.SessionManager;
+import workpal.Session.SessionManager;
+import static com.sun.javafx.scene.CameraHelper.project;
 import javax.swing.*;
 import java.awt.*;
+import workpal.dao.ProjectDAO;
+import workpal.model.Project;
+import workpal.ui.*;
 
-/**
- *
- * @author Bashaer
- */
+
 public class MainForm extends JFrame{
     private JButton btnProjects, btnTasks, btnGoals, btnGoalSteps, btnLogout;
     public MainForm(){
-        setTitle("Workpal - Main Dashboard");
+        setTitle("WorkPal");
         setSize(400,450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
         
-        JLabel title =new JLabel("WorkPal Dashboard",SwingConstants.CENTER);
-        title.setFont(new Font("Arial",Font.BOLD,22));
-        title.setBounds(0, 20, 400, 40);
-        //btnContinue.setBounds(130, 250, 140, 40);
-        //btnContinue.setBackground(new Color(0, 51, 102));
-        //btnContinue.setForeground(Color.WHITE);
-        //btnContinue.setFont(new Font("Arial", Font.BOLD, 16));
+        JPanel header = new JPanel();
+        header.setBackground(new Color(3, 120, 40));
+        header.setBounds(0, 0, 400, 50);
+        JLabel lblHeader = new JLabel("WorkPal", SwingConstants.CENTER);
+        lblHeader.setForeground(Color.WHITE);
+        lblHeader.setFont(new Font("Arial", Font.BOLD, 20));
+        header.setLayout(new BorderLayout());
+        header.add(lblHeader, BorderLayout.CENTER);
+        add(header);
+        
         btnProjects=new JButton ("Manage Projects");
         btnProjects.setBounds(100, 90, 200, 40);
         btnProjects.setBackground(new Color(0, 51, 102));
@@ -59,19 +60,25 @@ public class MainForm extends JFrame{
         
         btnLogout =new JButton("Logout");
         btnLogout.setBounds(150, 330, 100, 35);
-        btnLogout.setBackground(new Color(3, 60, 150));
+        btnLogout.setBackground(new Color(3, 120, 40));
         btnLogout.setForeground(Color.WHITE);
         add(btnLogout);
-        //Button Actions
+        
+        btnTasks.addActionListener(e -> {
+        ProjectDAO dao = new ProjectDAO();
+        Project defaultProject = dao.getProjectById(1); 
+        TaskForm taskForm = new TaskForm(defaultProject);
+        taskForm.setVisible(true);
+        });
+        
+        
+        // Actions Buttons
         btnProjects.addActionListener(e -> {
             ProjectForm projectForm = new ProjectForm();
             projectForm.setVisible(true);
         });
 
-        btnTasks.addActionListener(e -> {
-            TaskForm taskForm = new TaskForm();
-            taskForm.setVisible(true);
-        });
+        
 
         btnGoals.addActionListener(e -> {
             GoalForm goalForm = new GoalForm();
@@ -92,6 +99,7 @@ public class MainForm extends JFrame{
     }
 
     public static void main(String[] args) {
+        
         SwingUtilities.invokeLater(() -> new MainForm().setVisible(true));
     }
 }

@@ -1,179 +1,155 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package workpal.ui;
 
 import workpal.dao.GoalDAO;
 import workpal.dao.GoalStepDAO;
+import workpal.dao.TaskDAO; 
 import workpal.model.Goal;
 import workpal.model.GoalStep;
+import workpal.model.Task; 
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-/**
- *
- * @author Bashaer
- */
-public class GoalStepForm extends JFrame{
+public class GoalStepForm extends JFrame {
     private JComboBox<Goal> goalComboBox;
-    private JTextField descriptionField;
+    private JComboBox<Task> taskComboBox; 
     private JTable stepsTable;
-
+    private DefaultTableModel model;
+    
     private GoalDAO goalDAO = new GoalDAO();
     private GoalStepDAO goalStepDAO = new GoalStepDAO();
+    private TaskDAO taskDAO = new TaskDAO();
 
     public GoalStepForm() {
         setTitle("Goal Steps Manager");
-        setSize(600, 450);
+        setSize(700, 500);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-    
-    //Top panel
-    JPanel topPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+
+        
+        JPanel topPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // select goal and tasks
         goalComboBox = new JComboBox<>();
-        descriptionField = new JTextField();
+        taskComboBox = new JComboBox<>(); 
 
         topPanel.add(new JLabel("Select Goal:"));
         topPanel.add(goalComboBox);
-
-        topPanel.add(new JLabel("Step Description:"));
-        topPanel.add(descriptionField);
-
+        topPanel.add(new JLabel("Select Task to Add:"));
+        topPanel.add(taskComboBox);
+        
         add(topPanel, BorderLayout.NORTH);
-        //Table
-        stepsTable = new JTable();
-        JScrollPane tablePane = new JScrollPane(stepsTable);
-        add(tablePane, BorderLayout.CENTER);
 
-        // BUTTONS PANEL --------------------------------------------------
+        
+        String[] cols = {"Step ID", "Goal ID", "Description", "Completed"};
+        model = new DefaultTableModel(cols, 0) {
+            @Override
+            public Class<?> getColumnClass(int col) {
+                return col == 3 ? Boolean.class : Object.class;
+            }
+        };
+        stepsTable = new JTable(model);
+        add(new JScrollPane(stepsTable), BorderLayout.CENTER);
+
+       
         JPanel buttonPanel = new JPanel();
-
         JButton addBtn = new JButton("Add Step");
-        JButton updateBtn = new JButton("Update");
         JButton deleteBtn = new JButton("Delete");
         JButton completeBtn = new JButton("Mark Completed");
 
+        styleButton(addBtn, new Color(0, 51, 102));
+        styleButton(deleteBtn, new Color(0, 51, 102));
+        styleButton(completeBtn, new Color(3, 120, 40));
+
         buttonPanel.add(addBtn);
-        buttonPanel.add(updateBtn);
         buttonPanel.add(deleteBtn);
         buttonPanel.add(completeBtn);
-
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Load data
+        //load data
         loadGoals();
-        //Button Action
-        addBtn.addActionListener(e -> {
-            Goal selected = (Goal) goalComboBox.getSelectedItem();
-            String desc = descriptionField.getText();
+        loadTasks(); 
 
-            if (selected == null || desc.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Fill all fields");
-                return;
-            }
-
-            GoalStep step = new GoalStep(0, selected.getGoalId(), desc);
-            if (goalStepDAO.addGoalStep(step)) {
-                JOptionPane.showMessageDialog(this, "Step added!");
-                loadSteps(selected.getGoalId());
-            }
-        });
-
-        // تحديث خطوة
-        updateBtn.addActionListener(e -> {
-            int row = stepsTable.getSelectedRow();
-            if (row == -1) {
-                JOptionPane.showMessageDialog(this, "Select a step first");
-                return;
-            }
-
-            int stepId = (int) stepsTable.getValueAt(row, 0);
-            String newDesc = descriptionField.getText();
-            boolean completed = (boolean) stepsTable.getValueAt(row, 3);
-
-            GoalStep step = new GoalStep(stepId, ((Goal) goalComboBox.getSelectedItem()).getGoalId(), newDesc);
-            if (completed) step.markComplete();
-
-            if (goalStepDAO.updateStep(step)) {
-                JOptionPane.showMessageDialog(this, "Updated!");
-                loadSteps(step.getGoalId());
-            }
-        });
-
-        // حذف خطوة
-        deleteBtn.addActionListener(e -> {
-            int row = stepsTable.getSelectedRow();
-            if (row == -1) {
-                JOptionPane.showMessageDialog(this, "Select a step");
-                return;
-            }
-
-            int stepId = (int) stepsTable.getValueAt(row, 0);
-
-            if (goalStepDAO.deleteStep(stepId)) {
-                JOptionPane.showMessageDialog(this, "Deleted!");
-                Goal g = (Goal) goalComboBox.getSelectedItem();
-                loadSteps(g.getGoalId());
-            }
-        });
-
-        // تعليم كمكتملة
-        completeBtn.addActionListener(e -> {
-            int row = stepsTable.getSelectedRow();
-            if (row == -1) {
-                JOptionPane.showMessageDialog(this, "Select a step");
-                return;
-            }
-
-            int stepId = (int) stepsTable.getValueAt(row, 0);
-
-            if (goalStepDAO.markStepCompleted(stepId)) {
-                JOptionPane.showMessageDialog(this, "Marked as completed!");
-                Goal g = (Goal) goalComboBox.getSelectedItem();
-                loadSteps(g.getGoalId());
-            }
-        });
-
-        // تحميل الخطوات عند تغيير الهدف
+        
+        //update table
         goalComboBox.addActionListener(e -> {
             Goal selected = (Goal) goalComboBox.getSelectedItem();
-            if (selected != null)
-                loadSteps(selected.getGoalId());
+            if (selected != null) loadSteps(selected.getGoalId());
         });
-    
-        setVisible(true);
+
+        
+       addBtn.addActionListener(e -> {
+    Goal selectedGoal = (Goal) goalComboBox.getSelectedItem();
+    Task selectedTask = (Task) taskComboBox.getSelectedItem(); 
+
+    if (selectedGoal != null && selectedTask != null) {
+       
+        GoalStep step = new GoalStep(selectedGoal.getGoalId(), selectedTask.getTitle()); 
+        
+        if (goalStepDAO.addGoalStep(step)) {
+            loadSteps(selectedGoal.getGoalId()); 
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to save to database");
+        }
     }
-        //Methods
-        private void loadGoals() {
+});
+
+        // delete task buttun
+        deleteBtn.addActionListener(e -> {
+            int row = stepsTable.getSelectedRow();
+            if (row == -1) return;
+            int stepId = (int) model.getValueAt(row, 0);
+            if (goalStepDAO.deleteStep(stepId)) {
+                loadSteps(((Goal) goalComboBox.getSelectedItem()).getGoalId());
+            }
+        });
+
+        //add task
+        completeBtn.addActionListener(e -> {
+            int row = stepsTable.getSelectedRow();
+            if (row == -1) return;
+            int stepId = (int) model.getValueAt(row, 0);
+            if (goalStepDAO.markStepCompleted(stepId)) {
+                loadSteps(((Goal) goalComboBox.getSelectedItem()).getGoalId());
+            }
+        });
+    }
+
+    private void styleButton(JButton btn, Color color) {
+        btn.setBackground(color);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+    }
+
+    private void loadGoals() {
+        goalComboBox.removeAllItems();
         List<Goal> goals = goalDAO.getAllGoals();
-        for (Goal g : goals) {
-            goalComboBox.addItem(g);
-        }
+        for (Goal g : goals) goalComboBox.addItem(g);
     }
-        private void loadSteps(int goalId) {
-        List<GoalStep> steps = goalStepDAO.getStepsByGoalId(goalId);
 
-        String[] cols = {"ID", "Goal ID", "Description", "Completed"};
-        DefaultTableModel model = new DefaultTableModel(cols, 0);
+    private void loadTasks() {
+        taskComboBox.removeAllItems();
+      
+        List<Task> tasks = taskDAO.getAllTasks(); 
+        for (Task t : tasks) taskComboBox.addItem(t);
+    }
 
-        for (GoalStep s : steps) {
-            model.addRow(new Object[]{
-                s.getStepId(),
-                s.getGoalId(),
-                s.getDescription(),
-                s.isCompleted()
-            });
-        }
+    private void loadSteps(int goalId) {
+    DefaultTableModel model = (DefaultTableModel) stepsTable.getModel();
+    model.setRowCount(0); 
 
-        stepsTable.setModel(model);
+    List<GoalStep> steps = goalStepDAO.getStepsByGoalId(goalId);
+    for (GoalStep s : steps) {
+        model.addRow(new Object[]{
+            s.getStepId(), 
+            s.getGoalId(), 
+            s.getDescription(), 
+            s.isCompleted()
+        });
     }
 }
-    
-        
-        
-    
-
+}

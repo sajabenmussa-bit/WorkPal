@@ -1,108 +1,144 @@
+
 package workpal.ui;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
 import workpal.dao.TaskDAO;
+import workpal.dao.ProjectDAO;
 import workpal.model.Task;
+import workpal.model.Project;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.List;
-import workpal.dao.ProjectDAO;
-import workpal.model.Project;
-/**
- *
- * @author Bashaer
- */
-public class TaskForm extends JFrame{
+
+public class TaskForm extends JFrame {
+
     private JComboBox<Project> projectComboBox;
-    private Project project;
     private JTable tableTasks;
-    private JTextField txtTitle, txtDescription, txtProjectId ;
-    private JButton btnAdd, btnUpdate , btnDelete;
-    private TaskDAO taskDAO = new TaskDAO (); 
-    ProjectDAO projectDAO = new ProjectDAO();
-    public TaskForm(Project project){
-        this.project=project;   //project passed from projectForm
-        loadTasksToTable();
-        setTitle("Tasks for Project :"+project.getTitle());
-        setSize(600,400);
+    private JTextField txtTitle, txtDescription;
+    private JButton btnAdd, btnUpdate, btnDelete;
+
+    private TaskDAO taskDAO = new TaskDAO();
+    private ProjectDAO projectDAO = new ProjectDAO();
+
+    private Project project; 
+
+    // Constructor 
+    public TaskForm(Project project) {
+        this.project = project;
+        setTitle("Tasks");
+        setSize(600, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(null);
-        //Labels & Fields
-        JLabel lblTitle =new JLabel("Task Title");
+        initUI();
+        loadProjectsToComboBox();
+
+        if (project != null) {
+            projectComboBox.setSelectedItem(project);
+        }
+
+        loadTasksToTable();
+    }
+    
+       public TaskForm() {
+           setLocationRelativeTo(null);
+    }
+   
+
+       // user interface
+        private void initUI() {
+
+        JLabel lblTitle = new JLabel("Task Title");
         lblTitle.setBounds(20, 20, 100, 25);
-        txtTitle=new JTextField();
+        txtTitle = new JTextField();
         txtTitle.setBounds(130, 20, 150, 25);
-        JLabel lblDescription=new JLabel("Description");
+
+        JLabel lblDescription = new JLabel("Description");
         lblDescription.setBounds(20, 60, 100, 25);
-        txtDescription=new JTextField();
+        txtDescription = new JTextField();
         txtDescription.setBounds(130, 60, 150, 25);
+
+        JLabel lblProject = new JLabel("Project");
+        lblProject.setBounds(20, 100, 100, 25);
+        projectComboBox = new JComboBox<>();
+        projectComboBox.setBounds(130, 100, 150, 25);
+        projectComboBox.setBackground(new Color(3, 120, 40));
+        projectComboBox.setForeground(Color.WHITE);
+        add(projectComboBox);
+
         
-        btnAdd=new JButton("Add");
+         btnAdd =new JButton("Add");
         btnAdd.setBounds(320, 20, 120, 30);
-        btnUpdate =new JButton("Update");
-        btnUpdate.setBounds(320, 60, 120, 25);
-        btnDelete =new JButton("Delete");
-        btnDelete.setBounds(320, 100, 120, 25);
-        add(lblTitle);add(txtTitle);
-        add(lblDescription);add(txtDescription);
-        add(btnAdd);add(btnUpdate);add(btnDelete);
-        //Table
-        tableTasks =new JTable();
+        btnAdd.setBackground(new Color(0, 51, 102));
+        btnAdd.setForeground(Color.WHITE);
+        add(btnAdd);
+        
+
+        btnUpdate = new JButton("Update");
+        btnUpdate.setBounds(320, 60, 120, 30);
+        btnUpdate.setBackground(new Color(0, 51, 102));
+        btnUpdate.setForeground(Color.WHITE);
+        add(btnUpdate);
+
+        
+        btnDelete = new JButton("Delete");
+        btnDelete.setBounds(320, 100, 120, 30);
+        btnDelete.setBackground(new Color(0, 51, 102));
+        btnDelete.setForeground(Color.WHITE);
+        add(btnDelete);
+
+        
+        add(lblTitle); add(txtTitle);
+        add(lblDescription); add(txtDescription);
+        add(lblProject); add(projectComboBox);
+        add(btnAdd); add(btnUpdate); add(btnDelete);
+
+        tableTasks = new JTable(new DefaultTableModel(new Object[]{
+            "ID", "Title", "Description", "Project"}, 0));
+
         JScrollPane scrollPane = new JScrollPane(tableTasks);
         scrollPane.setBounds(20, 150, 550, 200);
         add(scrollPane);
-        //Load Data
-        loadTasksToTable();
-        //Button Actions
+
+        // Actions
         btnAdd.addActionListener(e -> addTask());
         btnUpdate.addActionListener(e -> updateTask());
         btnDelete.addActionListener(e -> deleteTask());
-        // Table click
+
         tableTasks.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = tableTasks.getSelectedRow();
-                if(row >= 0){
-                    txtTitle.setText(tableTasks.getValueAt(row,1).toString());
-                    txtDescription.setText(tableTasks.getValueAt(row,2).toString());
-                    
-                }
-                int projectId=(int) tableTasks.getValueAt(row, 3);
-                for(int i=0;i<projectComboBox.getItemCount();i++){
-                    if(projectComboBox.getItemAt(i).getProjectId()==projectId){
-                        projectComboBox.setSelectedIndex(i);
-                        break;
-                    }
+                if (row >= 0) {
+                    txtTitle.setText(tableTasks.getValueAt(row, 1).toString());
+                    txtDescription.setText(tableTasks.getValueAt(row, 2).toString());
+                    projectComboBox.setSelectedItem(tableTasks.getValueAt(row, 3));
                 }
             }
         });
     }
 
-    TaskForm() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    // load projects
     private void loadProjectsToComboBox() {
-    projectComboBox.removeAllItems();
-    List<Project> projects = projectDAO.getAllProjects();
-    for(Project p : projects){
-        projectComboBox.addItem(p);
+        projectComboBox.removeAllItems();
+        projectComboBox.setForeground(Color.WHITE);
+        
+        List<Project> projects = projectDAO.getAllProjects();
+        for (Project p : projects) {
+            projectComboBox.addItem(p);
+        }
     }
-}
-   private void loadTasksToTable() {
-    SwingWorker<Void, Task> worker = new SwingWorker<>() {
+
+    //load tasks
+    private void loadTasksToTable() {
+
+       SwingWorker<Void, Task> worker = new SwingWorker<>() {
         @Override
         protected Void doInBackground() throws Exception {
-            List<Task> tasks = taskDAO.getAllTasks(); // أو getTasksByProject(selectedProjectId)
+            List<Task> tasks = taskDAO.getAllTasks();
             for (Task t : tasks) {
-                publish(t); // ترسل كل مهمة لواجهة المستخدم
+                publish(t);
             }
             return null;
         }
@@ -110,80 +146,94 @@ public class TaskForm extends JFrame{
         @Override
         protected void process(List<Task> chunks) {
             DefaultTableModel model = (DefaultTableModel) tableTasks.getModel();
-            model.setRowCount(0); // تنظيف الجدول
+            model.setRowCount(0); // ✅ تنظيف الجدول قبل إعادة تعبئته
             for (Task t : chunks) {
                 Project p = projectDAO.getProjectById(t.getProjectId());
                 model.addRow(new Object[]{
                     t.getTaskId(),
                     t.getTitle(),
                     t.getDescription(),
-                    p // تخزين الكائن Project مباشرة
+                    p
                 });
             }
         }
     };
-
-    worker.execute(); // يبدأ التنفيذ بالخلفية
+    worker.execute();
 }
+
+    //add task
     private void addTask() {
-    Project selectedProject = (Project) projectComboBox.getSelectedItem();
-    if(selectedProject == null){
-        JOptionPane.showMessageDialog(this, "Please select a project!");
-        return;
-    }
 
-    String title = txtTitle.getText();
-    String description = txtDescription.getText();
-
-    Task task = new Task(0, title, description, selectedProject.getProjectId());
-    boolean success = taskDAO.addTask(task);
-
-    if(success){
-        JOptionPane.showMessageDialog(this, "Task added successfully!");
-        txtTitle.setText("");
-        txtDescription.setText("");
-        loadTasksToTable();
-    } else {
-        JOptionPane.showMessageDialog(this, "Failed to add Task!");
-    }
- }
-    
-    private void updateTask() {
-    int selectedRow = tableTasks.getSelectedRow();
-    if(selectedRow >= 0){
-        int taskId = (int) tableTasks.getValueAt(selectedRow, 0);
-        String title = txtTitle.getText();
-        String description = txtDescription.getText();
         Project selectedProject = (Project) projectComboBox.getSelectedItem();
+        if (selectedProject == null) {
+            JOptionPane.showMessageDialog(this, "Please select a project!");
+            return;
+        }
 
-        Task task = new Task(taskId, title, description, selectedProject.getProjectId());
-        boolean success = taskDAO.updateTask(task);
-        if(success){
+        Task task = new Task(
+                0,
+                txtTitle.getText(),
+                txtDescription.getText(),
+                selectedProject.getProjectId()
+        );
+
+        if (taskDAO.addTask(task)) {
+            JOptionPane.showMessageDialog(this, "Task added successfully!");
+            txtTitle.setText("");
+            txtDescription.setText("");
+            loadTasksToTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to add task!");
+        }
+        
+    }
+
+    // update task
+    private void updateTask() {
+
+        int row = tableTasks.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Select a task first!");
+            return;
+        }
+
+        Project selectedProject = (Project) projectComboBox.getSelectedItem();
+        if (selectedProject == null) {
+            JOptionPane.showMessageDialog(this, "Please select a project!");
+            return;
+        }
+
+        Task task = new Task(
+                (int) tableTasks.getValueAt(row, 0),
+                txtTitle.getText(),
+                txtDescription.getText(),
+                selectedProject.getProjectId()
+        );
+
+        if (taskDAO.updateTask(task)) {
             JOptionPane.showMessageDialog(this, "Task updated successfully!");
             loadTasksToTable();
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to update task.");
+            JOptionPane.showMessageDialog(this, "Failed to update task!");
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a task to update.");
     }
-}
 
+    // delete task
     private void deleteTask() {
-    int selectedRow = tableTasks.getSelectedRow();
-    if(selectedRow >= 0){
-        int taskId = (int) tableTasks.getValueAt(selectedRow, 0);
-        boolean success = taskDAO.removeTask(taskId);
-        if(success){
+
+        int row = tableTasks.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Select a task first!");
+            return;
+        }
+
+        int taskId = (int) tableTasks.getValueAt(row, 0);
+
+        if (taskDAO.removeTask(taskId)) {
             JOptionPane.showMessageDialog(this, "Task deleted successfully!");
             loadTasksToTable();
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to delete task.");
+            JOptionPane.showMessageDialog(this, "Failed to delete task!");
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a task to delete.");
     }
 }
-    
-}
-

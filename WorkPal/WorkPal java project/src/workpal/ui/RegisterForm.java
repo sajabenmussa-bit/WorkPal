@@ -1,6 +1,6 @@
 
 package workpal.ui;
-import Session.SessionManager;
+import workpal.Session.SessionManager;
 import workpal.ui.ProjectForm;
 
 
@@ -60,7 +60,7 @@ public class RegisterForm extends JFrame {
         // Confirm Button
         btnConfirm = new JButton("Confirm");
         btnConfirm.setBounds(130, 240, 140, 40);
-        btnConfirm.setBackground(new Color(0, 51, 102));
+        btnConfirm.setBackground(new Color(3, 120, 40));
         btnConfirm.setForeground(Color.WHITE);
         btnConfirm.setFont(new Font("Arial", Font.BOLD, 16));
 
@@ -107,8 +107,8 @@ public class RegisterForm extends JFrame {
             if (rows > 0) {
                 SessionManager.saveLogin(username);
                 new MainForm().setVisible(true);
-                JOptionPane.showMessageDialog(this, "User registered successfully!");
-                new ProjectForm().setVisible(true); 
+               
+               
                 this.dispose();
             }
         } catch (Exception ex) {
@@ -117,15 +117,10 @@ public class RegisterForm extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new RegisterForm().setVisible(true);
-        });
-        
-    }
+    
 
-    private void ispose() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       private void ispose() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
 
