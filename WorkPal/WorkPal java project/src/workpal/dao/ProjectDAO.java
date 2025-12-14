@@ -6,6 +6,7 @@ import java.sql.*;
 import java.util.*;
 
 public class ProjectDAO {
+    
 
    //add a new project
     public boolean addProject(Project project) {
@@ -95,7 +96,6 @@ public class ProjectDAO {
         }
     }
     //All projects
-    // داخل ProjectDAO
     public List<Project> getAllProjects() {
      List<Project> projects = new ArrayList<>();
      String sql = "SELECT * FROM project";
@@ -123,7 +123,7 @@ public class ProjectDAO {
      return projects;
 }
     public Project getProjectById(int projectId) {
-    String sql = "SELECT * FROM projects WHERE projectId = ?";
+    String sql = "SELECT * FROM project WHERE project_id = ?";
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -132,12 +132,12 @@ public class ProjectDAO {
 
         if (rs.next()) {
             return new Project(
-                rs.getInt("projectId"),
-                rs.getInt("userId"),
+                rs.getInt("project_id"),
+                rs.getInt("user_id"),
                 rs.getString("title"),
                 rs.getString("description"),
-                rs.getDate("startDate"),
-                rs.getDate("endDate")
+                rs.getDate("start_date"),
+                rs.getDate("end_date")
             );
         }
 
@@ -146,6 +146,8 @@ public class ProjectDAO {
     }
     return null; 
 }
+ 
+
 }
 
 

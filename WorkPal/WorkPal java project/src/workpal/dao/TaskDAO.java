@@ -1,23 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package workpal.dao;
 
 import workpal.model.Task;
 import workpal.model.DBConnection;
 import java.sql.*;
 import java.util.*;
-/**
- *
- * @author Bashaer
- */
+
 public class TaskDAO {
 
 
-    // CREATE - إضافة مهمة
+    //add a task
     public boolean addTask(Task task) {
-        String sql = "INSERT INTO tasks(title, description, projectId) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO tasks(title, description, project_id) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -34,7 +28,7 @@ public class TaskDAO {
         }
     }
 
-    // READ - جلب كل المهام
+    // get task
     public List<Task> getAllTasks() {
         List<Task> tasks = new ArrayList<>();
         String sql = "SELECT * FROM tasks";
@@ -44,10 +38,10 @@ public class TaskDAO {
 
             while (rs.next()) {
                 Task task = new Task(
-                        rs.getInt("taskId"),
+                        rs.getInt("task_id"),
                         rs.getString("title"),
                         rs.getString("description"),
-                        rs.getInt("projectId")
+                        rs.getInt("project_id")
                 );
                 tasks.add(task);
             }
@@ -58,9 +52,9 @@ public class TaskDAO {
         return tasks;
     }
 
-    // UPDATE - تعديل مهمة
+    // update task
     public boolean updateTask(Task task) {
-        String sql = "UPDATE tasks SET title=?, description=?, projectId=? WHERE taskId=?";
+        String sql = "UPDATE tasks SET title=?, description=?, project_id=? WHERE task_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -78,13 +72,13 @@ public class TaskDAO {
         }
     }
 
-    // DELETE - حذف مهمة
-    public boolean removeTask(int taskId) {
-        String sql = "DELETE FROM tasks WHERE taskId=?";
+    // dalate task
+    public boolean removeTask(int task_id) {
+        String sql = "DELETE FROM tasks WHERE task_id=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, taskId);
+            stmt.setInt(1, task_id);
             int rows = stmt.executeUpdate();
             return rows > 0;
 
@@ -95,29 +89,24 @@ public class TaskDAO {
     }
     public List<Task> getTasksByProject(int projectId) {
     List<Task> tasks = new ArrayList<>();
-    String sql = "SELECT * FROM tasks WHERE projectId = ?";
-
+    String sql = "SELECT * FROM tasks WHERE project_id = ?";
     try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        ps.setInt(1, projectId);
-        ResultSet rs = ps.executeQuery();
-
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, projectId);
+        ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
-            Task t = new Task(
-                rs.getInt("taskId"),
-                rs.getInt("projectId"),
+            Task task = new Task(
+                rs.getInt("task_id"),
+                rs.getInt("project_id"),
                 rs.getString("title"),
                 rs.getString("description"),
-                rs.getDate("dueDate")
+                rs.getDate("due_date") 
             );
-            tasks.add(t);
+            tasks.add(task);
         }
-
     } catch (SQLException e) {
         e.printStackTrace();
     }
-
     return tasks;
 }
 }
