@@ -34,9 +34,7 @@ public String toString() {
        
     }
 
-    public Goal(int i, String title, String description) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    
 
     // Getters & Setters
     public int getGoalId() { return goalId; }
