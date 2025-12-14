@@ -2,6 +2,7 @@
 package workpal.model;
 
 import java.util.*;
+import workpal.model.DBConnection;
 
 public class Goal {
     private int goalId;
@@ -10,17 +11,31 @@ public class Goal {
     private String description;
     private ArrayList<GoalStep> steps;
 
-    public Goal(int goalId, int userId, String title, String description) {
+    public Goal(int goalId, String title, String description) {
         this.goalId = goalId;
-        this.userId = userId;
         this.title = title;
         this.description = description;
         this.steps = new ArrayList<>();
     }
+    @Override
+public String toString() {
+    return title;
+}
+    //Constructors
+    public Goal() {
+  
+    }
+
+    public Goal(String title, String description) {
+       
+    }
+
+    public Goal(int aInt, String string, String string0, int aInt0) {
+       
+    }
 
     // Getters & Setters
     public int getGoalId() { return goalId; }
-    public int getUserId() { return userId; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public ArrayList<GoalStep> getSteps() { return steps; }

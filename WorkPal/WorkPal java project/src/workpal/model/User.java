@@ -11,6 +11,8 @@ public class User {
     private String password;
     private String email;
 
+    
+    //Constructors
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
@@ -18,7 +20,7 @@ public class User {
     }
 
     public User(int aInt, String string, String string0, String string1) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public int getId() {
