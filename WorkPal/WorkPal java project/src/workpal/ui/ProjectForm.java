@@ -1,11 +1,13 @@
 
 package workpal.ui;
 
-import static com.sun.javafx.scene.CameraHelper.project;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
+
+import workpal.Session.SessionManager;
+import workpal.dao.ProjectDAO;
 import workpal.model.Project;
 
 public class ProjectForm extends JFrame {
@@ -35,13 +37,15 @@ public class ProjectForm extends JFrame {
         lblTitle.setBounds(40, 60, 100, 30);
         txtTitle = new JTextField();
         txtTitle.setBounds(150, 60, 200, 30);
-        add(lblTitle); add(txtTitle);
+        add(lblTitle); 
+        add(txtTitle);
 
         JLabel lblDescription = new JLabel("Description :");
         lblDescription.setBounds(40, 100, 100, 30);
         txtDescription = new JTextField();
         txtDescription.setBounds(150, 100, 200, 30);
-        add(lblDescription); add(txtDescription);
+        add(lblDescription); 
+        add(txtDescription);
 
         JLabel lblStartDate = new JLabel("Start date :");
         lblStartDate.setBounds(40, 140, 100, 30);
@@ -49,7 +53,8 @@ public class ProjectForm extends JFrame {
         startDatePicker = new JSpinner(startModel);
         startDatePicker.setEditor(new JSpinner.DateEditor(startDatePicker, "yyyy-MM-dd"));
         startDatePicker.setBounds(150, 140, 200, 30);
-        add(lblStartDate); add(startDatePicker);
+        add(lblStartDate); 
+        add(startDatePicker);
 
         JLabel lblEndDate = new JLabel("End date :");
         lblEndDate.setBounds(40, 180, 100, 30);
@@ -57,7 +62,8 @@ public class ProjectForm extends JFrame {
         endDatePicker = new JSpinner(endModel);
         endDatePicker.setEditor(new JSpinner.DateEditor(endDatePicker, "yyyy-MM-dd"));
         endDatePicker.setBounds(150, 180, 200, 30);
-        add(lblEndDate); add(endDatePicker);
+        add(lblEndDate); 
+        add(endDatePicker);
 
         btnContinue = new JButton("countinue");
         btnContinue.setBounds(130, 250, 140, 40);
@@ -66,14 +72,37 @@ public class ProjectForm extends JFrame {
         btnContinue.setFont(new Font("Arial", Font.BOLD, 16));
         add(btnContinue);
 
-        btnContinue.addActionListener(e -> goToTaskForm());
+        btnContinue.addActionListener(e -> saveProjectAndGoToTaskForm());
     }
 
-    private void goToTaskForm() {
-        
-        JOptionPane.showMessageDialog(this, "Project saved successfully!");
-        TaskForm taskForm = new TaskForm(project);
-        taskForm.setVisible(true);
-        this.setVisible(false);
+    private void saveProjectAndGoToTaskForm() {
+        String title = txtTitle.getText().trim();
+        String description = txtDescription.getText().trim();
+
+        if (title.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Project name is required!");
+            return;
+        }
+
+        int userId = SessionManager.getLoggedUserId();
+        if (userId == -1) {
+            JOptionPane.showMessageDialog(this, "No logged-in user found. Please log in again.");
+            return;
+        }
+
+        Date startDate = (Date) startDatePicker.getValue();
+        Date endDate = (Date) endDatePicker.getValue();
+
+        project = new Project(0, userId, title, description, startDate, endDate);
+
+        ProjectDAO projectDAO = new ProjectDAO();
+        if (projectDAO.addProject(project)) {
+            JOptionPane.showMessageDialog(this, "Project saved successfully!");
+            TaskForm taskForm = new TaskForm(project);
+            taskForm.setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to save project!");
+        }
     }
 }

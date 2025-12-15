@@ -9,10 +9,10 @@ public class ProjectDAO {
     
 
    //add a new project
-    public boolean addProject(Project project) {
+   public boolean addProject(Project project) {
         String sql = "INSERT INTO project (user_id, title, description, start_date, end_date) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, project.getUserId());
             stmt.setString(2, project.getTitle());
@@ -21,7 +21,15 @@ public class ProjectDAO {
             stmt.setDate(5, new java.sql.Date(project.getEndDate().getTime()));
 
             int rows = stmt.executeUpdate();
-            return rows > 0;
+            if (rows > 0) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        project.setProjectId(rs.getInt(1));
+                    }
+                }
+                return true;
+            }
+            return false;
 
         } catch (SQLException e) {
          e.printStackTrace();

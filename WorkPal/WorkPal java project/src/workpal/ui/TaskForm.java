@@ -23,6 +23,9 @@ public class TaskForm extends JFrame {
     private ProjectDAO projectDAO = new ProjectDAO();
 
     private Project project; 
+    
+    // Background thread for periodic autorefresh of tasks
+    private Thread autoRefreshThread;
 
     // Constructor 
     public TaskForm(Project project) {
@@ -40,6 +43,22 @@ public class TaskForm extends JFrame {
         }
 
         loadTasksToTable();
+
+        // Start background autorefresh thread 
+        startAutoRefreshThread();
+
+        // Ensure the background thread stops when the window is closed
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                stopAutoRefreshThread();
+            }
+
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                stopAutoRefreshThread();
+            }
+        });
     }
     
        public TaskForm() {
@@ -160,6 +179,30 @@ public class TaskForm extends JFrame {
     };
     worker.execute();
 }
+
+    // Multithreading
+    private void startAutoRefreshThread() {
+        autoRefreshThread = new Thread(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    // Reload tasks safely on the EDT
+                    SwingUtilities.invokeLater(this::loadTasksToTable);
+                    Thread.sleep(10_000); // refresh every 10 seconds
+                }
+            } catch (InterruptedException ex) {
+                // Thread interrupted when form is closed; safe to exit
+                Thread.currentThread().interrupt();
+            }
+        });
+        autoRefreshThread.setDaemon(true);
+        autoRefreshThread.start();
+    }
+
+    private void stopAutoRefreshThread() {
+        if (autoRefreshThread != null && autoRefreshThread.isAlive()) {
+            autoRefreshThread.interrupt();
+        }
+    }
 
     //add task
     private void addTask() {
