@@ -36,6 +36,8 @@ public class GoalStepForm extends JFrame {
         // select goal and tasks
         goalComboBox = new JComboBox<>();
         taskComboBox = new JComboBox<>(); 
+        
+       
 
         topPanel.add(new JLabel("Select Goal:"));
         topPanel.add(goalComboBox);
@@ -73,7 +75,8 @@ public class GoalStepForm extends JFrame {
         //load data
         loadGoals();
         loadTasks(); 
-
+        loadAllSteps();
+        
         
         //update table
         goalComboBox.addActionListener(e -> {
@@ -139,8 +142,8 @@ public class GoalStepForm extends JFrame {
     }
 
     private void loadSteps(int goalId) {
-    DefaultTableModel model = (DefaultTableModel) stepsTable.getModel();
-    model.setRowCount(0); 
+           DefaultTableModel model = (DefaultTableModel) stepsTable.getModel();
+           model.setRowCount(0); 
 
     List<GoalStep> steps = goalStepDAO.getStepsByGoalId(goalId);
     for (GoalStep s : steps) {
@@ -152,4 +155,21 @@ public class GoalStepForm extends JFrame {
         });
     }
 }
+    private void loadAllSteps() {
+             model.setRowCount(0); 
+
+    List<Goal> goals = goalDAO.getAllGoals();
+    for (Goal g : goals) {
+        List<GoalStep> steps = goalStepDAO.getStepsByGoalId(g.getGoalId());
+        for (GoalStep s : steps) {
+            model.addRow(new Object[]{
+                s.getStepId(),
+                s.getGoalId(),
+                s.getDescription(),
+                s.isCompleted()
+            });
+        }
+    }
+}
+
 }

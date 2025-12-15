@@ -24,8 +24,7 @@ public class ProjectDAO {
             return rows > 0;
 
         } catch (SQLException e) {
-            
-            e.printStackTrace();
+         e.printStackTrace();
             return false;
         }
     }

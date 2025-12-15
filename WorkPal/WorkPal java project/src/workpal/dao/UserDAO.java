@@ -11,7 +11,7 @@ public class UserDAO {
     
     // add user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO users(username, passwordHash, email) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO user(user_name, password, email) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
