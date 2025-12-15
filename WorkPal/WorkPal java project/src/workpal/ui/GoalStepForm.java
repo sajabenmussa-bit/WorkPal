@@ -56,6 +56,7 @@ public class GoalStepForm extends JFrame {
         };
         stepsTable = new JTable(model);
         add(new JScrollPane(stepsTable), BorderLayout.CENTER);
+        
 
        
         JPanel buttonPanel = new JPanel();
@@ -84,7 +85,8 @@ public class GoalStepForm extends JFrame {
             if (selected != null) loadSteps(selected.getGoalId());
         });
 
-        
+         loadSteps(((Goal) goalComboBox.getSelectedItem()).getGoalId());
+         
        addBtn.addActionListener(e -> {
     Goal selectedGoal = (Goal) goalComboBox.getSelectedItem();
     Task selectedTask = (Task) taskComboBox.getSelectedItem(); 
@@ -100,7 +102,7 @@ public class GoalStepForm extends JFrame {
         }
     }
 });
-
+ 
         // delete task buttun
         deleteBtn.addActionListener(e -> {
             int row = stepsTable.getSelectedRow();
