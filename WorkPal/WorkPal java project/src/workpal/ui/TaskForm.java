@@ -185,12 +185,12 @@ public class TaskForm extends JFrame {
         autoRefreshThread = new Thread(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    // Reload tasks safely on the EDT
+                   
                     SwingUtilities.invokeLater(this::loadTasksToTable);
-                    Thread.sleep(10_000); // refresh every 10 seconds
+                    Thread.sleep(10_000); 
                 }
             } catch (InterruptedException ex) {
-                // Thread interrupted when form is closed; safe to exit
+             
                 Thread.currentThread().interrupt();
             }
         });
