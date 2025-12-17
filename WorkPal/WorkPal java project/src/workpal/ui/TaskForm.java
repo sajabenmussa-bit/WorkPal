@@ -165,7 +165,7 @@ public class TaskForm extends JFrame {
         @Override
         protected void process(List<Task> chunks) {
             DefaultTableModel model = (DefaultTableModel) tableTasks.getModel();
-            model.setRowCount(0); // ✅ تنظيف الجدول قبل إعادة تعبئته
+            model.setRowCount(0); 
             for (Task t : chunks) {
                 Project p = projectDAO.getProjectById(t.getProjectId());
                 model.addRow(new Object[]{
